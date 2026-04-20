@@ -37,19 +37,6 @@ export default function Login() {
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, [countdown]);
 
-  const autoVerify = async (code: string, phoneNum: string) => {
-    try {
-      const res = await api.post("/auth/verify-otp", { phone: phoneNum.trim(), code });
-      const token = res.data?.token ?? res.data?.access_token;
-      const user  = res.data?.user;
-      if (token && user) login(token, user);
-      navigate(from, { replace: true });
-    } catch (e: any) {
-      setError(e?.response?.data?.message ?? "Auto-verify failed. Enter OTP manually.");
-      setLoading(false);
-    }
-  };
-
   const sendOtp = async () => {
     setError("");
     setLoading(true);
@@ -61,12 +48,10 @@ export default function Login() {
         const code = res.data.otp as string;
         setDevOtp(code);
         setOtp(code.split(""));
-        setTimeout(() => autoVerify(code, phone), 800);
-      } else {
-        setLoading(false);
       }
     } catch (e: any) {
       setError(e?.response?.data?.message ?? "Failed to send OTP. Try again.");
+    } finally {
       setLoading(false);
     }
   };
@@ -196,10 +181,14 @@ export default function Login() {
             /* ── OTP step ───────────────────────────────────────────────── */
             <div className="space-y-5">
               {devOtp && (
-                <div className="bg-amber-50 border border-amber-200 rounded-xl px-3 py-2.5 flex items-center gap-2 text-amber-700 text-xs">
-                  <Shield size={14} className="flex-shrink-0" />
-                  <span>Dev mode — your OTP is <span className="font-bold tracking-[0.2em]">{devOtp}</span></span>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => setOtp(devOtp.split(""))}
+                  className="w-full bg-amber-50 border-2 border-amber-300 rounded-xl px-4 py-3 text-center hover:bg-amber-100 transition-colors"
+                >
+                  <p className="text-xs text-amber-600 font-medium mb-1">Your OTP (tap to fill)</p>
+                  <p className="text-3xl font-black tracking-[0.3em] text-amber-700">{devOtp}</p>
+                </button>
               )}
 
               <div>
