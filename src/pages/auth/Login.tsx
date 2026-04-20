@@ -23,7 +23,8 @@ export default function Login() {
   const [error,     setError]     = useState("");
   const [countdown, setCountdown] = useState(0);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-  const timerRef  = useRef<ReturnType<typeof setInterval> | null>(null);
+  const timerRef      = useRef<ReturnType<typeof setInterval> | null>(null);
+  const autoVerifyRef = useRef(false);
 
   useEffect(() => {
     if (countdown > 0) {
@@ -36,6 +37,13 @@ export default function Login() {
     }
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, [countdown]);
+
+  useEffect(() => {
+    if (sent && !loading && !autoVerifyRef.current && otp.every(d => d !== "") && otp.join("").length === 4) {
+      autoVerifyRef.current = true;
+      verify();
+    }
+  }, [otp, sent, loading]);
 
   const sendOtp = async () => {
     setError("");
@@ -106,6 +114,7 @@ export default function Login() {
     setOtp(["", "", "", ""]);
     setDevOtp(null);
     setError("");
+    autoVerifyRef.current = false;
     sendOtp();
   };
 
@@ -230,7 +239,7 @@ export default function Login() {
 
               <div className="flex items-center justify-between text-xs">
                 <button
-                  onClick={() => { setSent(false); setOtp(["","","",""]); setDevOtp(null); setError(""); }}
+                  onClick={() => { setSent(false); setOtp(["","","",""]); setDevOtp(null); setError(""); autoVerifyRef.current = false; }}
                   className="text-gray-500 hover:text-gray-700"
                 >
                   ← Change number
