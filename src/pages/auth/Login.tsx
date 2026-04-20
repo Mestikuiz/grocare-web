@@ -37,6 +37,19 @@ export default function Login() {
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, [countdown]);
 
+  const autoVerify = async (code: string, phoneNum: string) => {
+    try {
+      const res = await api.post("/auth/verify-otp", { phone: phoneNum.trim(), code });
+      const token = res.data?.token ?? res.data?.access_token;
+      const user  = res.data?.user;
+      if (token && user) login(token, user);
+      navigate(from, { replace: true });
+    } catch (e: any) {
+      setError(e?.response?.data?.message ?? "Auto-verify failed. Enter OTP manually.");
+      setLoading(false);
+    }
+  };
+
   const sendOtp = async () => {
     setError("");
     setLoading(true);
@@ -44,10 +57,16 @@ export default function Login() {
       const res = await api.post("/auth/send-otp", { phone: phone.trim() });
       setSent(true);
       setCountdown(60);
-      if (res.data?.otp) setDevOtp(res.data.otp);
+      if (res.data?.otp) {
+        const code = res.data.otp as string;
+        setDevOtp(code);
+        setOtp(code.split(""));
+        setTimeout(() => autoVerify(code, phone), 800);
+      } else {
+        setLoading(false);
+      }
     } catch (e: any) {
       setError(e?.response?.data?.message ?? "Failed to send OTP. Try again.");
-    } finally {
       setLoading(false);
     }
   };
