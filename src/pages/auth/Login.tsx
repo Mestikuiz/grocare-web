@@ -53,9 +53,7 @@ export default function Login() {
       setSent(true);
       setCountdown(60);
       if (res.data?.otp) {
-        const code = res.data.otp as string;
-        setDevOtp(code);
-        setOtp(code.split(""));
+        setDevOtp(res.data.otp as string);
       }
     } catch (e: any) {
       setError(e?.response?.data?.message ?? "Failed to send OTP. Try again.");
@@ -190,14 +188,11 @@ export default function Login() {
             /* ── OTP step ───────────────────────────────────────────────── */
             <div className="space-y-5">
               {devOtp && (
-                <button
-                  type="button"
-                  onClick={() => setOtp(devOtp.split(""))}
-                  className="w-full bg-amber-50 border-2 border-amber-300 rounded-xl px-4 py-3 text-center hover:bg-amber-100 transition-colors"
-                >
-                  <p className="text-xs text-amber-600 font-medium mb-1">Your OTP (tap to fill)</p>
-                  <p className="text-3xl font-black tracking-[0.3em] text-amber-700">{devOtp}</p>
-                </button>
+                <div className="w-full bg-blue-50 border-2 border-[#2382AA]/40 rounded-xl px-4 py-4 text-center">
+                  <p className="text-xs text-[#2382AA] font-semibold mb-2 uppercase tracking-wide">Your verification code</p>
+                  <p className="text-4xl font-black tracking-[0.4em] text-[#2382AA]">{devOtp}</p>
+                  <p className="text-[11px] text-gray-400 mt-2">Enter this code in the boxes below</p>
+                </div>
               )}
 
               <div>
