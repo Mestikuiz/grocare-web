@@ -209,6 +209,26 @@ function SimilarCarousel({
   );
 }
 
+// ── Description with Read More ────────────────────────────────────────────────
+function DescriptionBlock({ html }: { html: string }) {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <div>
+      <div
+        className="product-desc text-sm text-gray-600 leading-relaxed overflow-hidden transition-all duration-300"
+        style={{ display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: expanded ? 'unset' : 3, overflow: expanded ? 'visible' : 'hidden' } as React.CSSProperties}
+        dangerouslySetInnerHTML={{ __html: html }}
+      />
+      <button
+        onClick={() => setExpanded(e => !e)}
+        className="mt-2 text-xs font-semibold text-[#2382AA] hover:underline"
+      >
+        {expanded ? 'Read Less ▲' : 'Read More ▼'}
+      </button>
+    </div>
+  );
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
@@ -531,10 +551,7 @@ export default function ProductDetail() {
               )}
             </div>
             {product.description && (
-              <div
-                className="product-desc text-sm text-gray-600 leading-relaxed"
-                dangerouslySetInnerHTML={{ __html: product.description }}
-              />
+              <DescriptionBlock html={product.description} />
             )}
             {/* Tags */}
             {product.tags && product.tags.length > 0 && (
@@ -570,18 +587,6 @@ export default function ProductDetail() {
         </div>
       </div>
 
-      {/* Full description block (if long) */}
-      {product.description && product.description.length > 120 && (
-        <section className="mb-12">
-          <h2 className="text-lg font-bold text-gray-900 mb-3">Product Description</h2>
-          <div className="bg-white rounded-xl border border-gray-100 px-5 py-4">
-            <div
-              className="product-desc text-sm text-gray-700 leading-relaxed"
-              dangerouslySetInnerHTML={{ __html: product.description }}
-            />
-          </div>
-        </section>
-      )}
 
       {/* Reviews */}
       <ReviewsSection productId={product.id} />
