@@ -509,7 +509,7 @@ export default function Products() {
                     return b ? <FilterChip key={bid} label={b.name} onRemove={() => handleBrand(bid, false)} /> : null;
                   })}
                   {inStockParam && <FilterChip label="In Stock" onRemove={() => handleInStock(false)} />}
-                  {(minPriceParam || maxPriceParam) && (
+                  {(minPriceParam > 0 || maxPriceParam > 0) && (
                     <FilterChip
                       label={`Rs. ${minPriceParam || "0"} – ${maxPriceParam || "∞"}`}
                       onRemove={() => handlePriceApply([0, 0])}
